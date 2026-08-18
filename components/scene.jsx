@@ -1,20 +1,39 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, MeshTransmissionMaterial } from "@react-three/drei";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { StarField } from "@/components/space/star-field";
+import { NetworkField } from "@/components/space/network-field";
+import { SpaceCamera } from "@/components/space/space-camera";
 
-function Sculpture() {
-  const group = useRef();
+function SpaceEnvironment({ compact }) {
+  const universe = useRef();
   useFrame((state, delta) => {
-    const scroll = window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight);
-    group.current.rotation.y += delta * 0.065;
-    group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, -0.2 + scroll * 0.55, 2, delta);
-    group.current.position.y = THREE.MathUtils.damp(group.current.position.y, 0.25 - scroll * 1.2, 2, delta);
-    group.current.scale.setScalar(THREE.MathUtils.damp(group.current.scale.x, 1 + scroll * 0.35, 2, delta));
+    if (!universe.current) return;
+    universe.current.rotation.y += delta * 0.003;
+    universe.current.rotation.x = THREE.MathUtils.damp(universe.current.rotation.x, state.pointer.y * 0.012, 1.5, delta);
   });
-  return <group ref={group} rotation={[0.2, 0.25, 0]}><Float speed={1.1} rotationIntensity={0.18} floatIntensity={0.42}><mesh scale={[1.35, 1.65, 1.05]}><icosahedronGeometry args={[1, 5]} /><MeshTransmissionMaterial transmission={1} thickness={1.3} roughness={0.06} ior={1.25} chromaticAberration={0.035} anisotropy={0.18} color="#c6d7f0" /></mesh></Float><mesh position={[0.45, -0.25, -0.42]} rotation={[0.7, 0, 0.5]} scale={[0.52, 1.15, 0.34]}><octahedronGeometry args={[1, 2]} /><meshPhysicalMaterial color="#6b82a0" transparent opacity={0.25} roughness={0.05} metalness={0.2} /></mesh></group>;
+  return <group ref={universe}>
+    <StarField count={compact ? 300 : 850} spread={58} depth={42} size={2.1} opacity={0.62} seed={11} />
+    <StarField count={compact ? 160 : 420} spread={34} depth={25} size={3.2} opacity={0.78} seed={29} clustered />
+    <StarField count={compact ? 45 : 105} spread={19} depth={12} size={5.1} opacity={0.9} seed={47} near />
+    {!compact && <NetworkField />}
+    <fog attach="fog" args={["#010409", 13, 52]} />
+  </group>;
 }
-function Lights() { return <><ambientLight intensity={0.25} /><pointLight position={[-3, 2, 3]} intensity={5} color="#9cc1ff" /><pointLight position={[3, -1, 2]} intensity={3} color="#e8edff" /><pointLight position={[0, 3, -3]} intensity={2} color="#809abb" /></>; }
-export default function Scene() { return <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 5.6], fov: 42 }} gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}><Lights /><Sculpture /></Canvas>; }
+
+function SpaceCanvas() {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 700px), (pointer: coarse)");
+    const update = () => setCompact(query.matches);
+    update(); query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  return <Canvas dpr={compact ? [1, 1.15] : [1, 1.4]} camera={{ position: [0, 0, 8], fov: compact ? 54 : 48 }} gl={{ alpha: true, antialias: !compact, powerPreference: "high-performance" }} onCreated={({ gl }) => gl.setClearColor("#010409", 1)}>
+    <SpaceCamera compact={compact} /><SpaceEnvironment compact={compact} />
+  </Canvas>;
+}
+
+export default function Scene() { return <SpaceCanvas />; }

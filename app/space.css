@@ -1,0 +1,43 @@
+/* Space journey presentation layer: the portfolio content remains normal HTML. */
+.space-stage > :not(.portal) { opacity: .24; transform: translateY(42px); filter: blur(5px); transition: opacity 1s cubic-bezier(.2,.8,.2,1), transform 1.1s cubic-bezier(.2,.8,.2,1), filter .85s ease; }
+.space-stage.space-visible > :not(.portal) { opacity: 1; transform: none; filter: none; }
+.scene-wrap::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 62% 38% at 16% 19%, rgba(28,58,82,.15), transparent 68%), radial-gradient(ellipse 46% 31% at 83% 72%, rgba(20,38,63,.13), transparent 73%), linear-gradient(180deg, rgba(1,4,9,.14), rgba(1,4,9,.46)); }
+.work-link { display: inline-flex; align-items: center; gap: 14px; padding: 8px 0; color: #e8f7ff; border-bottom: 1px solid rgba(109,220,255,.55); font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; transition: gap .25s ease, color .25s ease; }
+.work-link:hover { gap: 22px; color: #6ddcff; }
+.space-stage .portal { opacity: .18; transform: perspective(700px) rotateY(11deg) scale(.9); transition: opacity 1.2s ease, transform 1.3s cubic-bezier(.2,.8,.2,1); }
+.space-stage.space-visible .portal { opacity: 1; transform: perspective(700px) rotateY(11deg) scale(1); }
+.work .projects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 34px; }
+.work-heading { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 34px; padding-top: 15px; border-top: 1px solid rgba(131,171,190,.24); }
+.work-heading > p:last-child { max-width: 330px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.work .project-card { display: flex; flex-direction: column; gap: 18px; align-items: stretch; padding: 8px; border: 1px solid rgba(123,164,185,.16); background: linear-gradient(145deg, rgba(13,28,39,.66), rgba(3,9,15,.38)); box-shadow: 0 22px 55px rgba(0,0,0,.13); transition: border-color .35s ease, transform .45s cubic-bezier(.2,.8,.2,1), background .35s ease; }
+.work .project-card:hover { transform: translateY(-7px); border-color: rgba(125,196,222,.42); background: linear-gradient(145deg, rgba(17,38,52,.82), rgba(3,9,15,.5)); }
+.work .project-art { height: min(27vw, 370px); display: block; background: #07131b; overflow: hidden; }
+.work .project-art img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: top; opacity: 1; filter: saturate(.92) contrast(1.08); transition: transform .55s cubic-bezier(.2,.8,.2,1), filter .25s ease; }
+.work .project-art:hover img { transform: scale(1.045); opacity: 1; filter: saturate(1) contrast(1); }
+.work .project-info { min-height: 210px; padding: 4px 8px 8px; }
+.work .project-info h3 { font-size: clamp(2rem, 3.4vw, 3.6rem); }
+.work .project-description { margin: 18px 0; }
+.work .project-meta { font-size: 8px; border-top-color: rgba(143,190,212,.25); }
+.tech-stage { overflow: hidden; }
+.tech-orb { left: 42% !important; top: 18% !important; width: 220px !important; height: 220px !important; display: grid; place-items: center; isolation: isolate; background: radial-gradient(circle at 32% 27%, rgba(255,255,255,.72), color-mix(in srgb, var(--planet-color) 68%, #071019) 25%, #061016 72%) !important; box-shadow: -16px 18px 35px rgba(0,0,0,.48), 0 0 75px color-mix(in srgb, var(--planet-color) 40%, transparent) !important; transition: background .6s ease, box-shadow .6s ease, border-radius .8s ease; }
+.tech-orb::before { content: ""; position: absolute; width: 290px; height: 78px; border: 1px solid color-mix(in srgb, var(--planet-color) 74%, transparent); border-radius: 50%; transform: rotate(-22deg); box-shadow: 0 0 20px color-mix(in srgb, var(--planet-color) 24%, transparent); z-index: -1; }
+.tech-orb::after { content: ""; position: absolute; inset: 8%; border-radius: inherit; background: radial-gradient(circle at 32% 26%, rgba(255,255,255,.38), transparent 15%), repeating-linear-gradient(155deg, transparent 0 17px, rgba(255,255,255,.08) 18px 20px, transparent 21px 38px); mix-blend-mode: screen; opacity: .7; }
+.tech-orb i { position: absolute; width: 56%; height: 18%; right: -18%; top: 33%; border-radius: 50%; background: color-mix(in srgb, var(--planet-color) 62%, #010409); transform: rotate(-22deg); box-shadow: 0 4px 10px rgba(0,0,0,.28); }
+.tech-orb b { position: absolute; width: 24px; height: 24px; left: 28%; bottom: 22%; border-radius: 50%; background: rgba(0,0,0,.18); box-shadow: 31px -22px 0 -4px rgba(255,255,255,.13), 50px 22px 0 -7px rgba(0,0,0,.25); }
+.tech-orb span { position: relative; z-index: 1; max-width: 120px; padding: 5px 9px; text-align: center; color: #fff; font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .09em; text-transform: uppercase; text-shadow: 0 1px 6px #010409; }
+.technology .tech-stage { display: block; min-height: 0; padding: 52px 0 35px; border-top-color: rgba(143,190,212,.22); overflow: visible; }
+.tech-carousel { display: flex; gap: clamp(20px, 3vw, 52px); align-items: flex-start; overflow-x: auto; padding: 15px max(2px, calc((100vw - 83vw) / 2)) 27px; margin: 0 -8.5vw; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.tech-carousel::-webkit-scrollbar { display: none; }
+.tech-planet-card { flex: 0 0 118px; display: grid; justify-items: center; gap: 7px; padding: 0 0 12px; border: 0; background: transparent; color: #a6b0b3; cursor: pointer; scroll-snap-align: center; transition: color .25s ease, transform .35s cubic-bezier(.2,.8,.2,1); }
+.tech-planet-card:hover, .tech-planet-card.active { color: #f2f6f4; transform: translateY(-9px); }
+.tech-planet { position: relative; width: 88px; height: 88px; display: block; overflow: visible; border-radius: 50%; background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.75), color-mix(in srgb, var(--planet-color) 72%, #111928) 28%, #090d14 72%); box-shadow: inset -13px -13px 19px rgba(0,0,0,.52), -9px 13px 22px rgba(0,0,0,.4), 0 0 0 rgba(0,0,0,0); transition: transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s ease; }
+.tech-planet::before { content: ""; position: absolute; inset: 8%; border-radius: 50%; background: radial-gradient(circle at 31% 24%, rgba(255,255,255,.42), transparent 13%), repeating-linear-gradient(150deg, transparent 0 13px, rgba(255,255,255,.11) 14px 16px, transparent 17px 29px); mix-blend-mode: screen; opacity: .75; }
+.tech-planet::after { content: ""; position: absolute; width: 122%; height: 35%; left: -12%; top: 34%; border: 1px solid color-mix(in srgb, var(--planet-color) 77%, transparent); border-radius: 50%; transform: rotate(-18deg); opacity: .48; }
+.tech-planet i { position: absolute; width: 26%; height: 21%; left: 26%; bottom: 19%; border-radius: 50%; background: rgba(0,0,0,.2); box-shadow: 25px -17px 0 -3px rgba(255,255,255,.16), 43px 21px 0 -6px rgba(0,0,0,.28); }
+.tech-planet b { position: absolute; width: 45%; height: 12%; right: -12%; top: 42%; border-radius: 50%; background: color-mix(in srgb, var(--planet-color) 62%, #050a11); transform: rotate(-18deg); box-shadow: 0 4px 10px rgba(0,0,0,.28); }
+.tech-planet-card.active .tech-planet { transform: scale(1.13); box-shadow: inset -13px -13px 19px rgba(0,0,0,.52), -9px 13px 22px rgba(0,0,0,.4), 0 0 35px color-mix(in srgb, var(--planet-color) 38%, transparent); }
+.tech-index { font-family: "DM Mono", monospace; font-size: 8px; letter-spacing: .12em; color: color-mix(in srgb, var(--planet-color) 70%, #d6e8ee); }
+.tech-name { font-size: 12px; font-weight: 600; letter-spacing: -.035em; }
+@media (min-width: 1180px) { .work .projects { grid-template-columns: repeat(3, minmax(0, 1fr)); } .work .project-art { height: min(20vw, 310px); } .work .project-info { min-height: 190px; } }
+@media (max-width: 700px) { .space-stage > :not(.portal) { opacity: 1; transform: none; filter: none; } .space-stage .portal { opacity: 1; } .work-heading { display: block; margin-bottom: 36px; } .work-heading > p:last-child { margin-top: 15px; } .work .projects { grid-template-columns: 1fr; gap: 15vh; } .work .project-art { height: 76vw; } .technology .tech-stage { padding: 32px 0 20px; } .tech-carousel { gap: 25px; margin: 0 -20px; padding: 13px 20px 23px; } .tech-planet-card { flex-basis: 100px; } .tech-planet { width: 76px; height: 76px; } }
+@media (prefers-reduced-motion: reduce) { .space-stage > :not(.portal), .space-stage .portal { opacity: 1; transform: none; filter: none; transition: none; } }
