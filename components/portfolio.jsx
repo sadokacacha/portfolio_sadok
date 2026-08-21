@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import MouseTethers from "@/components/mouse-tethers";
 const Scene = dynamic(() => import("@/components/scene"), { ssr: false });
@@ -46,19 +46,50 @@ function Link({href,children,className=""}) { return <a href={href} className={`
 export default function Portfolio() {
   const [activeTech,setActiveTech] = useState("React");
   const [language,setLanguage] = useState("en");
+  const techCarouselRef = useRef(null);
   const t = copy[language];
   const changeLanguage = (nextLanguage) => { setLanguage(nextLanguage); document.documentElement.lang = nextLanguage; window.localStorage.setItem("portfolio-language", nextLanguage); };
   useEffect(() => { const move = (e) => { document.documentElement.style.setProperty("--mouse-x",`${e.clientX}px`); document.documentElement.style.setProperty("--mouse-y",`${e.clientY}px`); }; window.addEventListener("pointermove",move,{passive:true}); return () => window.removeEventListener("pointermove",move); },[]);
   useEffect(() => { const savedLanguage = window.localStorage.getItem("portfolio-language"); if (savedLanguage === "fr" || savedLanguage === "en") { setLanguage(savedLanguage); document.documentElement.lang = savedLanguage; } }, []);
   useEffect(() => { const stages=document.querySelectorAll(".space-stage"); const observer=new IntersectionObserver((entries)=>entries.forEach((entry)=>{if(entry.isIntersecting)entry.target.classList.add("space-visible");}),{threshold:0,rootMargin:"0px 0px -10% 0px"}); stages.forEach((stage)=>observer.observe(stage)); return()=>observer.disconnect(); },[]);
+  useEffect(() => {
+    const carousel = techCarouselRef.current;
+    if (!carousel || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const firstRepeatedCard = carousel.children[technologies.length];
+    const firstCard = carousel.children[0];
+    const cycleWidth = firstRepeatedCard && firstCard ? firstRepeatedCard.offsetLeft - firstCard.offsetLeft : 0;
+    let frame;
+    let paused = false;
+    const tick = () => {
+      if (!paused) {
+        carousel.scrollLeft += 0.35;
+        if (cycleWidth && carousel.scrollLeft >= cycleWidth) carousel.scrollLeft -= cycleWidth;
+      }
+      frame = window.requestAnimationFrame(tick);
+    };
+    const pause = () => { paused = true; };
+    const resume = () => { paused = false; };
+    carousel.addEventListener("pointerenter", pause);
+    carousel.addEventListener("pointerleave", resume);
+    carousel.addEventListener("focusin", pause);
+    carousel.addEventListener("focusout", resume);
+    frame = window.requestAnimationFrame(tick);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      carousel.removeEventListener("pointerenter", pause);
+      carousel.removeEventListener("pointerleave", resume);
+      carousel.removeEventListener("focusin", pause);
+      carousel.removeEventListener("focusout", resume);
+    };
+  }, []);
   return <main><div className="scene-wrap" aria-hidden="true"><Scene /></div><MouseTethers />
     <header className="site-header"><a href="#top" className="wordmark">SADOK<br/>ACACHA</a><nav aria-label="Primary navigation"><a href="#work">{t.nav[0]}</a><a href="#about">{t.nav[1]}</a><a href="#experience">{t.nav[2]}</a><a href="#contact">{t.nav[3]}</a></nav><div className="header-actions"><div className="language-switch" aria-label="Language"><button type="button" className={language === "en" ? "active" : ""} aria-pressed={language === "en"} onClick={()=>changeLanguage("en")}>EN</button><span>/</span><button type="button" className={language === "fr" ? "active" : ""} aria-pressed={language === "fr"} onClick={()=>changeLanguage("fr")}>FR</button></div><a className="cv-link" href="/Sadok-Acacha-CV.pdf" download>{t.download} <span>↓</span></a></div></header>
     <section id="top" className="hero section-shell"><div className="eyebrow hero-index"><span className="pulse"/> {t.available}</div><div className="hero-copy"><p className="eyebrow">{t.role}</p><h1>Sadok<br/><em>Acacha</em></h1><div className="hero-bottom"><p>{t.hero}</p><a href="#work" className="work-link">{t.viewWork} <span>↓</span></a></div></div><p className="scroll-note">{t.scroll} <span>↓</span></p></section>
     <section className="intro section-shell space-stage" aria-labelledby="intro-heading"><p className="eyebrow">{t.introLabel}</p><h2 id="intro-heading">{t.introTitle}</h2><p className="intro-text">{t.introText}</p></section>
     <section id="work" className="work section-shell space-stage" aria-labelledby="work-heading"><div className="work-heading"><p className="eyebrow" id="work-heading">{t.workLabel}</p></div><div className="projects">{projects.map(([number,title,,url,image],index)=><article className="project-card" key={title}><a className="project-art" href={url} target="_blank" rel="noreferrer" aria-label={`${t.visit} ${title}`}><img src={image} alt={`${t.preview} ${title}`}/><span className="project-no">{number}</span><span className="project-mark">SA</span></a><div className="project-info"><h3>{title}</h3><p className="project-description">{t.projects[index]}</p><div className="project-meta"><span>{t.liveSite}</span><a href={url} target="_blank" rel="noreferrer">{t.viewProject} <b>↗</b></a></div></div></article>)}</div></section>
-    <section id="about" className="about section-shell space-stage" aria-labelledby="about-heading"><div className="portal"><div className="portal-inner"/></div><div className="about-copy"><p className="eyebrow">{t.aboutLabel}</p><h2 id="about-heading">{t.aboutTitle}</h2><p>{t.aboutText}</p><Link href="/Sadok-Acacha-CV.pdf" className="outline-button">{t.download}</Link></div></section>
+    <section id="about" className="about section-shell space-stage" aria-labelledby="about-heading"><div className="about-signal" aria-hidden="true"><span>SA</span><i/><b/></div><div className="about-copy"><p className="eyebrow">{t.aboutLabel}</p><h2 id="about-heading">{t.aboutTitle}</h2><p>{t.aboutText}</p><Link href="/Sadok-Acacha-CV.pdf" className="outline-button">{t.download}</Link></div></section>
     <section id="experience" className="experience section-shell space-stage" aria-labelledby="experience-heading"><div className="section-heading"><p className="eyebrow">{t.experienceLabel}</p><h2 id="experience-heading">{t.experienceTitle}</h2></div><div className="timeline">{experience.map(([year,role,place],index)=><article className="timeline-entry" key={`${year}-${role}`}><p className="year">{year}</p><div><h3>{t.roles[index]}</h3><p className="timeline-place">{place}</p></div></article>)}</div></section>
-    <section className="technology section-shell space-stage" aria-labelledby="technology-heading"><div className="section-heading"><p className="eyebrow">{t.technologyLabel}</p><h2 id="technology-heading">{t.technologyTitle}</h2></div><div className="tech-stage"><div className="tech-carousel" role="list" aria-label={t.toolkit}>{technologies.map((tech,i)=><button type="button" role="listitem" onClick={()=>setActiveTech(tech)} onMouseEnter={()=>setActiveTech(tech)} onFocus={()=>setActiveTech(tech)} className={`tech-planet-card ${activeTech===tech?"active":""}`} style={{"--planet-color":colors[tech]}} key={tech}><span className={`tech-planet planet-variant-${i % 5}`} aria-hidden="true"><i/><b/></span><span className="tech-index">{String(i+1).padStart(2,"0")}</span><span className="tech-name">{tech}</span></button>)}</div></div></section>
-    <section id="contact" className="contact section-shell space-stage" aria-labelledby="contact-heading"><p className="eyebrow">{t.contactLabel}</p><h2 id="contact-heading">{t.contactTitle}</h2><div className="contact-links"><Link href="mailto:hello@sadokacacha.com">{t.email}</Link><Link href="https://github.com/">GitHub</Link><Link href="https://linkedin.com/">LinkedIn</Link></div><footer><span>{t.footer}</span><span>© 2026</span></footer></section>
+    <section className="technology section-shell space-stage" aria-labelledby="technology-heading"><div className="section-heading"><p className="eyebrow">{t.technologyLabel}</p><h2 id="technology-heading">{t.technologyTitle}</h2></div><div className="tech-stage"><div ref={techCarouselRef} className="tech-carousel" role="list" aria-label={t.toolkit}>{[...technologies, ...technologies].map((tech,i)=><button type="button" role="listitem" onClick={()=>setActiveTech(tech)} onMouseEnter={()=>setActiveTech(tech)} onFocus={()=>setActiveTech(tech)} className={`tech-planet-card ${activeTech===tech?"active":""}`} style={{"--planet-color":colors[tech]}} key={`${tech}-${i}`}><span className={`tech-planet planet-variant-${i % 5}`} aria-hidden="true"><i/><b/></span><span className="tech-index">{String((i % technologies.length)+1).padStart(2,"0")}</span><span className="tech-name">{tech}</span></button>)}</div></div></section>
+    <section id="contact" className="contact section-shell space-stage" aria-labelledby="contact-heading"><div className="contact-intro"><p className="eyebrow">{t.contactLabel}</p><h2 id="contact-heading">{t.contactTitle}</h2></div><div className="contact-panel"><p>Have a product in mind, a team to join, or a problem worth solving?</p><div className="contact-links"><Link href="mailto:sadokacacha1998@gmail.com">{t.email}</Link><Link href="https://github.com/sadokacacha" target="_blank">GitHub</Link><Link href="https://www.linkedin.com/in/sadok-acacha/" target="_blank">LinkedIn</Link></div><p className="contact-location">Tunisia · open to remote work</p></div><footer><span>{t.footer}</span><span>© 2026</span></footer></section>
   </main>;
 }
